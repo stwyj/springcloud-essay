@@ -20,7 +20,7 @@ Spring Cloud Eureka在Spring Cloud架构下主要用作于服务治理，也就�
 
 首先我们需要创建一个Spring Boot工程，引入Eureka的依赖，如下图所示：
 
-![eureka-server依赖](/ducument/img/eureka-server.png)
+![eureka-server依赖](/document/img/eureka-server.png)
 
 ### pom.xml（jar依赖）
 
