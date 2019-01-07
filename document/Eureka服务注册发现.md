@@ -155,7 +155,7 @@ public class EurekaServerApplication {
 
 在我们创建服务注册中心之后，我们需要在注册中心中注册我们的服务，也就是服务的提供者。
 
-![eureka-client](/document/img/eurela-client.png)
+![eureka-client](/document/img/eureka-client.png)
 
 ### pom.xml
 
