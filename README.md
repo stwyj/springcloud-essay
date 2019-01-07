@@ -8,7 +8,7 @@ this is an essay for springcloud
 
 ## 目录
 
-- [Spring Cloud：Eureka注册中心——服务注册与发现]()
+- [Spring Cloud：Eureka注册中心——服务注册与发现](/document/Eureka服务注册与发现.md)
 - [Spring Cloud：服务消费——RestTemplate]()
 - [Spring Cloud：服务消费——Ribbon]()
 - [Spring Cloud：服务消费——Feign]()
@@ -21,7 +21,8 @@ this is an essay for springcloud
 - [Spring Cloud：Sleuth——服务追踪]()
 - [Spring Cloud：服务追踪面板——zipkin]()
 - [Spring Cloud：服务追踪面板——kibana]()
-- [Spring Cloud：Gateway网关]()
+- [Spring Cloud：Gateway路由网关]()
+- [Spring Cloud：Consul注册中心——服务注册发现]()
 - [Spring Cloud：服务的高可用]()
 
 
