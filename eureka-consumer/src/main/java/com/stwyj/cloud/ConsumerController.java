@@ -16,9 +16,17 @@ public class ConsumerController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private RestTemplate loadBalanceRestTemplate;
+
     @GetMapping("serviceConsumer")
     public String serviceConsumer() {
         ServiceInstance serviceInstance = loadBalancerClient.choose("service-hello");
         return restTemplate.getForObject(serviceInstance.getUri().toString() + "/getPort", String.class);
+    }
+
+    @GetMapping("serviceConsumer2")
+    public String serviceConsumer2() {
+        return loadBalanceRestTemplate.getForObject("http://SERVICE-HELLO/getPort", String.class);
     }
 }

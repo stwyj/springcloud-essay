@@ -1,4 +1,4 @@
-# RestTemplate服务消费
+# 服务消费——Ribbon
 
 ## spring-cloud-commons
 
@@ -8,6 +8,29 @@
 
 同时我们使用到了LoadBalancerClient也就是，`@LoadBalanced`该注解的对应的接口LoadBalancerClient接口。
 
+## Ribbon
+
+什么是Ribbon，简单理解，我们可以认为Ribbon提供的是客户端负载均衡的一种分布式组件，是基于`Netflix Ribbon`实现的。
+
+Ribbon本身包括多部分功能，主要分为以下几种：
+
+1. `ServerList`，主要用于存储获取到的注册中心中提供服务的client的列表
+
+2. `ServerListFilter`，主要用于筛选`ServerList`获取到的server列表，获取到实际需要使用的servers
+
+3. `ServerListUpdater`，主要用于去刷新服务列表，当某个server下线等情况下，其能保证在一定时间内去刷新可用的服务列表
+
+4. `IPing`，主要用于验证服务的可用性
+
+5. `ILoadBalancer`，这里就是我们的主要核心，也就是我们的负载均衡主要在这里进行，对获取到的server进行负载均衡之后选择适合的server进行访问
+
+6. `IRule`，这个就是我们在负载均衡的过程中使用到的负载均衡策略
+
+7. `IClientConfig`，`Ribbon`主要用于获取配置信息，`Ribbon`提供了默认的实现（DefaultClientConfigImpl），底层通过Archauis获取配置信息，如果没有配置信息，DefaultClientConfigImpl也为各个配置项设置了默认值。DefaultClientConfigImpl的配置项的格式为：
+
+```text
+<clientName>.<nameSpace>.<propertyName>
+```
 ## eureka-consumer
 
 首先我们跟之前一样创建一个eureka-client的工程，如下图所示：
@@ -142,7 +165,7 @@ public class EurekaConsumerApplication {
 }
 ```
 
-我们在此定义了`RestTemplate`，用作于服务消费。Spring Cloud中服务之间的通信协议是通过`Http协议`的，所以其调用也就可以使用基于rest的http接口的`RestTemplate`。
+我们在此定义了`RestTemplate`，用作于服务消费。Spring Cloud中服务之间的通信协议是通过HTTP协议和TCP协议的，所以其调用也就可以使用基于rest的http接口的`RestTemplate`。
 
 ### ConsumerController.java
 
@@ -171,7 +194,7 @@ public class ConsumerController {
 }
 ```
 
-该类中，我们注入了一个基于客户端负载均衡的`LoadBalancerClient`，通过该负载均衡器，我们获取到需要消费的服务`service-hello`，通过`choose`方法获取到该服务的实例，然后我们通过`RestTemplate`直接调用该服务。
+该类中，我们注入了`Ribbon`基于客户端负载均衡的`LoadBalancerClient`，通过该负载均衡器，我们获取到需要消费的服务`service-hello`，通过`choose`方法获取到该服务的实例，然后我们通过`RestTemplate`直接调用该服务。
 
 ### 注册页面
 
@@ -181,11 +204,43 @@ public class ConsumerController {
 
 ### 调用测试
 
-我们在浏览器`http://localhost:8083/serviceConsumer`输入该地址，我们可以看到返回结果一直在`this is a project for 8080`、`this is a project for 8081`、`this is a project for 8082`之间重复，这个就是因为我们在调用服务时的负载均衡器默认选择的是轮询算法，也就是会对获取到`service-hello`服务的所有实例之后，会依次轮询该实例来作为我们当次调用的实例。
+我们在浏览器`http://localhost:8083/serviceConsumer`输入该地址，我们可以看到返回结果一直在`this is a project for 8080`、`this is a project for 8081`、`this is a project for 8082`之间重复，这个就是因为我们在调用服务时的负载均衡器默认选择的是轮询策略，也就是会对获取到`service-hello`服务的所有实例之后，会依次轮询该实例来作为我们当次调用的实例。
+
+### 扩展
+
+在使用客户端负载均衡时，我们也可以直接使用注解的方式，这时候我们需要进行如下改造：
+
+- EurekaConsumerApplication.java中新增一个Bean，代码如下：
+
+```java
+@Bean("loadBalanceRestTemplate")
+@LoadBalanced
+public RestTemplate loadBalanceRestTemplate() {
+    return new RestTemplate();
+}
+```
+
+- ConsumerController.java中我们新增代码
+
+```java
+// 注入新的ResTempalte
+@Autowired
+private RestTemplate loadBalanceRestTemplate;
+
+// ---------------------------------省略代码，具体参考源码，此处只做分析----------------------------------------
+
+// 增加如下方法
+@GetMapping("serviceConsumer2")
+public String serviceConsumer2() {
+    return loadBalanceRestTemplate.getForObject("http://SERVICE-HELLO/getPort", String.class);
+}
+```
+
+修改代码之后，我们访问`http://localhost:8083/serviceConsumer2`，我们会发现该`serviceConsumer2`与`serviceConsumer`两个方法返回时一致的，这个就是`Ribbon`的客户端负载均衡的两种实现，一个是`LoadBalancerClient`，一个是注解`@LoadBalanced`。
 
 ## 总结
 
-以上就是通过RestTemplate以及spring-cLoud-commons包的基础服务消费，其核心是commons包里面定义的各种接口，当我们选定注册中心后，它会自带该接口的实现，这个也就为Spring Cloud在对各种组件选择上提供了很强的扩展性。
+以上就是`Ribbon`通过`RestTemplate`以及`spring-cloud-commons`包的基础服务消费，实现`commons`的接口，同时`Ribbon`提供了多种注册中心的实现，但是正具体的实现过程并不需要我们去了解，我们仅仅需要相同的调用方式就可以，这个也就为Spring Cloud在对各种组件选择上提供了很强的扩展性。
 
 ## 源码
 
