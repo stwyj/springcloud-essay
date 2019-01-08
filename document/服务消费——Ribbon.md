@@ -31,6 +31,7 @@ Ribbon本身包括多部分功能，主要分为以下几种：
 ```text
 <clientName>.<nameSpace>.<propertyName>
 ```
+
 ## eureka-consumer
 
 首先我们跟之前一样创建一个eureka-client的工程，如下图所示：
