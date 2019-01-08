@@ -9,7 +9,7 @@ this is an essay for springcloud
 ## 目录
 
 - [Spring Cloud：Eureka注册中心——服务注册与发现](/document/Eureka服务注册发现.md)
-- [Spring Cloud：服务消费——RestTemplate]()
+- [Spring Cloud：服务消费——RestTemplate](/document/RestTemplate服务消费.md)
 - [Spring Cloud：服务消费——Ribbon]()
 - [Spring Cloud：服务消费——Feign]()
 - [Spring Cloud：服务异常保护(容错机制)——Hystrix]()
